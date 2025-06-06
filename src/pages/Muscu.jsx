@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 const muscuPlan = {
   Lundi: {
@@ -39,9 +39,26 @@ export default function Muscu() {
   const [charges, setCharges] = useState({})
   const [intensite, setIntensite] = useState('')
   const [remplacements, setRemplacements] = useState({})
+  const [historique, setHistorique] = useState({})
+
+  useEffect(() => {
+    const data = localStorage.getItem('charges_histo')
+    if (data) setHistorique(JSON.parse(data))
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem('charges_histo', JSON.stringify(historique))
+  }, [historique])
 
   const handleChangeCharge = (exo, value) => {
     setCharges(prev => ({ ...prev, [exo]: value }))
+    const date = new Date().toLocaleDateString()
+    setHistorique(prev => {
+      const newHisto = { ...prev }
+      if (!newHisto[exo]) newHisto[exo] = []
+      newHisto[exo].push({ date, value })
+      return newHisto
+    })
   }
 
   const handleRemplacement = (exo) => {
@@ -109,6 +126,18 @@ export default function Muscu() {
               >
                 🔁 Remplacer l'exercice
               </button>
+
+              {/* Tableau historique */}
+              {historique[exo] && (
+                <div className="mt-2 text-sm">
+                  <p className="font-semibold">Historique :</p>
+                  <ul className="list-disc ml-5">
+                    {historique[exo].slice(-5).reverse().map((h, i) => (
+                      <li key={i}>{h.date} : {h.value} kg</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </li>
           )
         })}
