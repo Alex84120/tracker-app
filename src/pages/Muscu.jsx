@@ -59,17 +59,6 @@ export default function Muscu() {
     localStorage.setItem(`activite_${jour}`, activiteLibre.toString())
   }, [activiteLibre, jour])
 
-  const handleChangeCharge = (exo, value) => {
-    setCharges(prev => ({ ...prev, [exo]: value }))
-    const date = new Date().toLocaleDateString()
-    setHistorique(prev => {
-      const newHisto = { ...prev }
-      if (!newHisto[exo]) newHisto[exo] = []
-      newHisto[exo].push({ date, value })
-      return newHisto
-    })
-  }
-
   const handleRemplacement = (exo) => {
     const remplacement = prompt(`Par quoi veux-tu remplacer "${exo}" ?`)
     if (remplacement) {
@@ -115,21 +104,42 @@ export default function Muscu() {
                 <li key={index} className="mb-4 border-b pb-2">
                   <div className="font-semibold">{exo}</div>
                   <div>Séries : {series} — Reps : {reps}</div>
+
                   <input
                     type="text"
                     placeholder="Charge utilisée (kg)"
                     className="border px-2 py-1 mt-1 rounded w-full"
                     value={charges[exo] || ''}
-                    onChange={(e) => handleChangeCharge(exo, e.target.value)}
+                    onChange={(e) =>
+                      setCharges((prev) => ({ ...prev, [exo]: e.target.value }))
+                    }
                   />
+
+                  <button
+                    onClick={() => {
+                      const value = charges[exo]
+                      if (!value) return
+                      const date = new Date().toLocaleDateString()
+                      setHistorique((prev) => {
+                        const newHisto = { ...prev }
+                        if (!newHisto[exo]) newHisto[exo] = []
+                        newHisto[exo].push({ date, value })
+                        return newHisto
+                      })
+                      alert(`✅ Charge enregistrée pour ${exo} : ${value} kg`)
+                    }}
+                    className="bg-green-600 text-white px-2 py-1 rounded mt-1"
+                  >
+                    ✅ Valider
+                  </button>
+
                   <button
                     onClick={() => handleRemplacement(nom)}
-                    className="text-sm text-blue-500 underline mt-1"
+                    className="text-sm text-blue-500 underline mt-1 block"
                   >
                     🔁 Remplacer l'exercice
                   </button>
 
-                  {/* Historique de l'exercice */}
                   {historique[exo] && (
                     <div className="mt-2 text-sm">
                       <p className="font-semibold">Historique :</p>
@@ -157,7 +167,6 @@ export default function Muscu() {
         </>
       )}
 
-      {/* Case à cocher activité libre (escalade/trail) */}
       {isJourLibre && (
         <div className="mt-4">
           <label>
