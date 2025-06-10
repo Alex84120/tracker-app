@@ -1,7 +1,5 @@
 import React from 'react'
 import { supabase } from '../services/supabase'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 
 export default function Parametres() {
   const userId = localStorage.getItem('anon_id') || (() => {
@@ -46,53 +44,25 @@ export default function Parametres() {
   }
 
   const exportPDF = async () => {
+    const { default: jsPDF } = await import('jspdf')
+    const html2canvas = (await import('html2canvas')).default
     const doc = new jsPDF()
-    const poids = JSON.parse(localStorage.getItem('poids') || '[]')
-    const charges = JSON.parse(localStorage.getItem('charges_histo') || '{}')
 
+    // 1. Titre
+    doc.setFontSize(16)
     doc.text('📄 Suivi Tracker', 10, 10)
-    doc.text(`Poids enregistrés :`, 10, 20)
-    poids.forEach((p, i) => doc.text(`${p.date} : ${p.value} kg`, 10, 30 + i * 6))
 
-    doc.addPage()
-    doc.text('Surcharge progressive :', 10, 10)
-    Object.entries(charges).forEach(([exo, list], i) => {
-      doc.text(`${exo}:`, 10, 20 + i * 6)
-      const lines = list.slice(-3).map(h => `${h.date}: ${h.value} kg`).join(', ')
-      doc.text(lines, 40, 20 + i * 6)
+    // 2. Poids
+    const poids = JSON.parse(localStorage.getItem('poids') || '[]')
+    doc.setFontSize(12)
+    doc.text('Poids enregistrés :', 10, 20)
+    poids.forEach((p, i) => {
+      doc.text(`${p.date} : ${p.value} kg`, 10, 30 + i * 6)
     })
 
-    // Capture du graphique
-    const chart = document.querySelector('canvas')
-    if (chart) {
-      const canvas = await html2canvas(chart)
-      const imgData = canvas.toDataURL('image/png')
-      doc.addPage()
-      doc.addImage(imgData, 'PNG', 10, 10, 180, 80)
-    }
-
-    doc.save('suivi_tracker.pdf')
-  }
-
-  return (
-    <div className="p-4 space-y-4">
-      <h1 className="text-xl font-bold mb-2">⚙️ Paramètres</h1>
-
-      <button onClick={toggleDark} className="bg-blue-600 text-white px-4 py-2 rounded w-full">
-        🌓 Changer de mode
-      </button>
-
-      <button onClick={saveCloud} className="bg-green-600 text-white px-4 py-2 rounded w-full">
-        ☁️ Sauvegarder sur le cloud
-      </button>
-
-      <button onClick={loadCloud} className="bg-yellow-600 text-white px-4 py-2 rounded w-full">
-        ☁️ Restaurer depuis le cloud
-      </button>
-
-      <button onClick={exportPDF} className="bg-purple-600 text-white px-4 py-2 rounded w-full">
-        📄 Exporter en PDF
-      </button>
-    </div>
-  )
-}
+    // 3. Surcharge progressive
+    doc.addPage()
+    doc.setFontSize(14)
+    doc.text('Surcharge progressive', 10, 10)
+    const charges = JSON.parse(localStorage.getItem('charges_histo') || '{}')
+    doc.setFont
