@@ -7,9 +7,9 @@ import Nutrition from './pages/Nutrition'
 import Parametres from './pages/Parametres'
 import Navigation from './components/Navigation'
 
-export default function App() {
+function App() {
   return (
-    <div className="min-h-screen bg-white text-black dark:bg-zinc-900 dark:text-white">
+    <div className="min-h-screen px-4 py-6 bg-white text-black dark:bg-zinc-900 dark:text-white">
       <div className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
