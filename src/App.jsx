@@ -1,25 +1,16 @@
 import React from 'react'
-import { Routes, Route } from 'react-router-dom'
-import Home from './pages/Home'
-import Muscu from './pages/Muscu'
-import Suivi from './pages/Suivi'
-import Nutrition from './pages/Nutrition'
-import Parametres from './pages/Parametres'
-import Navigation from './components/Navigation'
+import { Outlet } from 'react-router-dom'
 
 export default function App() {
   return (
-    <div className="min-h-screen px-4 py-6 bg-white text-black dark:bg-zinc-900 dark:text-white">
-      <div className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/muscu" element={<Muscu />} />
-          <Route path="/suivi" element={<Suivi />} />
-          <Route path="/nutrition" element={<Nutrition />} />
-          <Route path="/parametres" element={<Parametres />} />
-        </Routes>
-      </div>
-      <Navigation />
+    <div className="min-h-screen bg-white text-black dark:bg-zinc-900 dark:text-white transition-all duration-300">
+      <header className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <h1 className="text-2xl font-bold">🎯 Tracker</h1>
+      </header>
+
+      <main className="p-4">
+        <Outlet />
+      </main>
     </div>
   )
 }
